@@ -1,0 +1,57 @@
+version: '3'
+services:
+    swarm-api:
+        image: 'asia.gcr.io/jovial-archive-216204/swarm-backend:1.0.0'
+        ports:
+            - '4000:4000'
+        networks:
+            - backend
+        environment:
+            - DEMO_ALLOWEDORIGINS=http://35.243.156.252:8300
+            - SERVER_PORT=4000
+        deploy:
+            replicas: 1
+            update_config: {parallelism: 1}
+            restart_policy: {condition: on-failure}
+            placement:
+                constraints: ['node.labels.service2 == springboot']
+    swarm-web:
+        image: 'asia.gcr.io/jovial-archive-216204/swarm-frontend:gcp'
+        ports:
+            - '8300:80'
+        networks:
+            - backend
+        environment:
+            - VUE_APP_BACKEND_HOST=http://35.243.156.252:4000
+        depends_on:
+            - swarm-api
+        deploy:
+            replicas: 1
+            update_config: {parallelism: 1}
+            restart_policy: {condition: on-failure}
+            placement:
+                constraints: ['node.labels.service == nodejs']
+    swarm-haproxy:
+        image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy'
+        ports:
+            - '8081:8081'
+            - '8082:8082'
+        networks:
+            - backend
+        depends_on:
+            - sgms-api
+        deploy:
+            replicas: 1
+            update_config: {parallelism: 2}
+            restart_policy: {condition: on-failure}
+            placement:
+                constraints: ['node.labels.service == haproxy']                
+    visualizer:
+        image: 'dockersamples/visualizer:stable'
+        ports:
+            - '8083:8080'
+        stop_grace_period: 1m30s
+        volumes:
+            - '/var/run/docker.sock:/var/run/docker.sock'
+networks:
+    backend:                
