@@ -7,7 +7,7 @@ services:
         networks:
             - backend
         environment:
-            - DEMO_ALLOWEDORIGINS=http://35.243.156.252:8300
+            - DEMO_ALLOWEDORIGINS=http://35.243.156.252:8081
             - SERVER_PORT=4000
         deploy:
             replicas: 1
@@ -32,6 +32,7 @@ services:
             placement:
                 constraints: ['node.labels.service == nodejs']
     swarm-haproxy:
+        image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp'
         image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp'
         ports:
             - '8081:8081'
