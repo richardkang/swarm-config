@@ -31,7 +31,7 @@ docker node update --label-add service=haproxy --label-add node=manager  docker-
 docker node ls -q | xargs docker node inspect   -f '{{ .ID }} [{{ .Description.Hostname }}]: {{ .Spec.Labels }}'
 ```
 
-# config haproxy
+# config / deploy haproxy
 ```cmd
 defaults
   mode http
@@ -62,6 +62,12 @@ backend front_api_back
     balance roundrobin
     server docker-node1 10.142.0.10:8300 check
     server docker-node2 10.142.0.11:8300 check
+```
+build image
+```cmd
+docker build -t swarm-haproxy:1.0.0 -f Dockerfile-haproxy .
+docker tag  swarm-haproxy:1.0.0 asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp
+gcloud docker -- push asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp
 ```
 
 # config docker-stack.yml && Deploy
@@ -139,7 +145,9 @@ networks:
 # Swarm command
 ```cmd
  docker stack ls
- docker stack rm
+ docker stack ps $StackName
+ docker stack services $StackName
+ docker stack rm $StackName
 
  docker node ls
 
