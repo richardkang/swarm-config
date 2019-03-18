@@ -32,7 +32,7 @@ services:
             placement:
                 constraints: ['node.labels.service == nodejs']
     swarm-haproxy:
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy'
+        image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp'
         ports:
             - '8081:8081'
             - '8082:8082'
@@ -53,5 +53,11 @@ services:
         stop_grace_period: 1m30s
         volumes:
             - '/var/run/docker.sock:/var/run/docker.sock'
+        deploy:
+            replicas: 1
+            update_config: {parallelism: 2}
+            restart_policy: {condition: on-failure}
+            placement:
+                constraints: ['node.labels.node == manager']                  
 networks:
     backend:                
