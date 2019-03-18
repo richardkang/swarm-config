@@ -154,6 +154,9 @@ networks:
  docker service ls
  
  docker service logs -f $ID
+
+ docker service scale my_stack_swarm-web=2
+ docker service scale my_stack_swarm-api=2
 ```
 
 # Swarm 
