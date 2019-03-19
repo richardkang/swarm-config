@@ -10,7 +10,7 @@ services:
             - DEMO_ALLOWEDORIGINS=http://35.243.156.252:8081
             - SERVER_PORT=4000
         deploy:
-            replicas: 1
+            replicas: 3
             update_config: {parallelism: 1}
             restart_policy: {condition: on-failure}
             placement:
@@ -26,7 +26,7 @@ services:
         depends_on:
             - swarm-api
         deploy:
-            replicas: 1
+            replicas: 3
             update_config: {parallelism: 1}
             restart_policy: {condition: on-failure}
             placement:
