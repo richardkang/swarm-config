@@ -77,22 +77,22 @@ gcloud docker -- push asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp
 version: '3'
 services:
     swarm-api:
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-backend:1.0.0'
+        image: 'docker.io/richardkang/swarm-backend:1.0.0'
         ports:
             - '4000:4000'
         networks:
             - backend
         environment:
-            - DEMO_ALLOWEDORIGINS=http://35.243.156.252:8300
+            - DEMO_ALLOWEDORIGINS=http://35.243.156.252:8081
             - SERVER_PORT=4000
         deploy:
-            replicas: 1
+            replicas: 3
             update_config: {parallelism: 1}
             restart_policy: {condition: on-failure}
             placement:
                 constraints: ['node.labels.service2 == springboot']
     swarm-web:
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-frontend:gcp'
+        image: 'docker.io/richardkang/swarm-frontend:gcp'
         ports:
             - '8300:80'
         networks:
@@ -102,13 +102,13 @@ services:
         depends_on:
             - swarm-api
         deploy:
-            replicas: 1
+            replicas: 3
             update_config: {parallelism: 1}
             restart_policy: {condition: on-failure}
             placement:
                 constraints: ['node.labels.service == nodejs']
     swarm-haproxy:
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy'
+        image: 'docker.io/richardkang/swarm-haproxy:gcp'
         ports:
             - '8081:8081'
             - '8082:8082'
@@ -136,7 +136,7 @@ services:
             placement:
                 constraints: ['node.labels.node == manager']                  
 networks:
-    backend:                
+    backend:                       
 
 ```  
 
@@ -152,8 +152,13 @@ networks:
  docker node ls
 
  docker service ls
- 
  docker service logs -f $ID
+ docker service create --name swarm-api-report -p 4100:4000 --replicas 2 --detach=false \
+ --placement-pref 'spread=node.labels.service2.springboot' \
+ --env DEMO_ALLOWEDORIGINS='http://35.243.156.252:8081' \
+ --env SERVER_PORT=4000 \
+ docker.io/richardkang/swarm-backend:1.0.0
+ docker service rm $ID
 
  docker service scale my_stack_swarm-web=2
  docker service scale my_stack_swarm-api=2
