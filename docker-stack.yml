@@ -1,7 +1,7 @@
 version: '3'
 services:
     swarm-api:
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-backend:1.0.0'
+        image: 'docker.io/richardkang/swarm-backend:1.0.0'
         ports:
             - '4000:4000'
         networks:
@@ -16,7 +16,7 @@ services:
             placement:
                 constraints: ['node.labels.service2 == springboot']
     swarm-web:
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-frontend:gcp'
+        image: 'docker.io/richardkang/swarm-frontend:gcp'
         ports:
             - '8300:80'
         networks:
@@ -32,8 +32,7 @@ services:
             placement:
                 constraints: ['node.labels.service == nodejs']
     swarm-haproxy:
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp'
-        image: 'asia.gcr.io/jovial-archive-216204/swarm-haproxy:gcp'
+        image: 'docker.io/richardkang/swarm-haproxy:gcp'
         ports:
             - '8081:8081'
             - '8082:8082'
